@@ -21,7 +21,7 @@ pipeline {
         stage ("build docker image") {
             steps {
                 echo "build docker image"
-                sh "docker build -t ${DOCKER_IMAGE} ."
+                sh "docker buildx build linux/amd64 -t ${DOCKER_IMAGE} ."
             }
         }
 
@@ -46,8 +46,8 @@ pipeline {
                     sh """
                         ssh -o StrictHostKeyChecking=no ubuntu@${EC2_IP} '
                             docker pull ${DOCKER_IMAGE}:latest &&
-                            docker stop ${CONTAINER_NAME} || true &&
-                            docker rm ${CONTAINER_NAME} || true &&
+                            (docker stop ${CONTAINER_NAME} || true) &&
+                            (docker rm ${CONTAINER_NAME} || true) &&
                             docker run -d --name ${CONTAINER_NAME} -p 3000:80 --restart always ${DOCKER_IMAGE}:latest
                         '
                     """
