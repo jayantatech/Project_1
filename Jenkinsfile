@@ -20,21 +20,17 @@ pipeline {
 
         stage ("build docker image") {
             steps {
-                echo "build docker image"
-                sh "docker buildx build --platform linux/amd64 --load -t ${DOCKER_IMAGE}:latest ."
-            }
-        }
-
-        stage ("push to docker hub") {
-            steps {
-                echo "pushing to docker hub"
+                echo "Building and pushing docker image"
                 script {
-                   docker.withRegistry("", "docker-hub") {
-                    // docker.image(CONTAINER_NAME).tag("${DOCKER_IMAGE}:latest")
-                    // docker.image("${DOCKER_IMAGE}:latest").push()
-                    // sh "docker tag ${DOCKER_IMAGE} ${DOCKER_IMAGE}:latest" 
-                    sh "docker push ${DOCKER_IMAGE}:latest"
-                   }
+                    docker.withRegistry("", "docker-hub") {
+                        sh """
+                            docker buildx build \
+                                --platform linux/amd64 \
+                                --push \
+                                --no-cache \
+                                -t ${DOCKER_IMAGE}:latest .
+                        """
+                    }
                 }
             }
         }
