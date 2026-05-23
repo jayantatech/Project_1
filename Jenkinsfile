@@ -43,15 +43,15 @@ pipeline {
             steps {
                 echo "ec2 deploy stage"
                 sshagent(['ec2-key']) {
-                sh """
-                    ssh -o StrictHostKeyChecking=no ubuntu@${EC2_IP} "
-                    docker pull ${DOCKER_IMAGE}:latest &&
-                    docker stop ${CONTAINER_NAME} || true &&
-                    docker rm ${CONTAINER_NAME} || true &&
-                    docker run -d --name ${CONTAINER_NAME} -p 3000:80 --restart always ${DOCKER_IMAGE}:latest
-               """
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ubuntu@${EC2_IP} '
+                            docker pull ${DOCKER_IMAGE}:latest &&
+                            docker stop ${CONTAINER_NAME} || true &&
+                            docker rm ${CONTAINER_NAME} || true &&
+                            docker run -d --name ${CONTAINER_NAME} -p 3000:80 --restart always ${DOCKER_IMAGE}:latest
+                        '
+                    """
                 }
-
             }
         }
     }
