@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Simple Design</title>
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial, Helvetica, sans-serif;
+    }
+
+    body{
+      height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      background:#f4f4f4;
+    }
+
+    .card{
+      width:320px;
+      background:white;
+      padding:30px;
+      border-radius:12px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.1);
+      text-align:center;
+    }
+
+    .card h1{
+      margin-bottom:10px;
+      color:#222;
+    }
+
+    .card p{
+      color:#666;
+      margin-bottom:20px;
+      line-height:1.5;
+    }
+
+    .card button{
+      padding:10px 20px;
+      border:none;
+      background:#222;
+      color:white;
+      border-radius:6px;
+      cursor:pointer;
+      transition:0.3s;
+    }
+
+    .card button:hover{
+      background:#444;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+    <h1>Hello Jay</h1>
+    <p>
+      This is a simple HTML and CSS design in one file.
+    </p>
+    <button>Get Started</button>
+  </div>
+
+</body>
+</html>
