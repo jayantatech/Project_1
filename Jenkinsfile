@@ -21,7 +21,7 @@ pipeline {
         stage ("build docker image") {
             steps {
                 echo "build docker image"
-                sh "docker buildx build linux/amd64 -t ${DOCKER_IMAGE} ."
+                sh "docker buildx build --platform linux/amd64 -t ${DOCKER_IMAGE} ."
             }
         }
 
