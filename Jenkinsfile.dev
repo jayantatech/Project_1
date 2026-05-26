@@ -10,8 +10,8 @@ pipeline{
         BRANCH="dev"
         IMAGE_TAG="${BRANCH}_${BUILD_NUMBER}"
 
-        CONTAINER_PORT:"80"
-        HOST_PORT:"3000"
+        CONTAINER_PORT="80"
+        HOST_PORT="3000"
 
         BUILD_PATH="${OS_HOME}/BUILDS/${PROJECT}/${IMAGE_NAME}/${JOB_NAME}/${BRANCH}"
         CONFIG_PATH="${OS_HOME}/container-configs/${BRANCH}/${IMAGE_NAME}"
