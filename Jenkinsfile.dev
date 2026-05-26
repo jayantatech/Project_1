@@ -1,0 +1,154 @@
+pipeline{
+    agent any 
+
+    environment {
+        OS_HOME="/home/ubuntu"
+
+        PROJECT="Project_1"
+        IMAGE_NAME="Project_1_dev"
+        CONTAINER_NAME="Project_1_dev"
+        BRANCH="dev"
+        IMAGE_TAG="${BRANCH}_${BUILD_NUMBER}"
+
+        CONTAINER_PORT:"80"
+        HOST_PORT:"3000"
+
+        BUILD_PATH="${OS_HOME}/BUILDS/${PROJECT}/${IMAGE_NAME}/${JOB_NAME}/${BRANCH}"
+        CONFIG_PATH="${OS_HOME}/container-configs/${BRANCH}/${IMAGE_NAME}"
+
+    }
+
+    stages {
+        stage("Prepare Build Directory") {
+        steps {
+            sh '''
+
+            echo "Creating the build directories"
+
+            mkdir -p "${BUILD_PATH}"
+            mkdir -p "${CONFIG_PATH}"
+
+            rm -rf "${BUILD_PATH:?}"/*
+
+            cp -R . ${BUILD_PATH}
+
+            echo "working dir"
+
+            pwd
+
+            rm -rf ${BUILD_PATH}/.git
+
+
+            '''
+
+        }
+
+        }
+
+        stage("Generate Build Metadata") {
+
+            steps {
+                sh '''
+
+cat > build_config.json <<EOF
+{
+"BUILD_NUMBER":"${BUILD_NUMBER}"
+"BUILD_ID":"${BUILD_ID}"
+"BUILD_DISPLAY_NAME":"${BUILD_DISPLAY_NAME}"
+"JOB_NAME": "${JOB_NAME}",
+"BRANCH": "${BRANCH}",
+"IMAGE_TAG": "${IMAGE_TAG}",
+"RUNTIME": "${CONTAINER_NAME}",
+"BUILD_TIME": "$(date '+%Y-%m-%d %H:%M:%S')"
+}
+EOF
+
+
+                  echo "Generated build_config.json"
+                  cat build_config.json
+                  echo "Build metadata generation successful."
+
+
+
+                '''
+
+            }
+        }
+
+
+        stage ("Docker Build") {
+            steps {
+                sh '''
+
+                set -e
+
+                cd ${BUILD_PATH}
+
+                echo "Removing the old container"
+
+                docker rm -f "${CONTAINER}" 2>/dev/null || true
+
+                 echo "Removing old image..."
+
+                docker rmi -f "${IMAGE_NAME}:latest" 2>/dev/null || true
+
+                echo "Building docker image..."
+
+                docker build -t "${IMAGE_NAME}/${IMAGE_TAG}"
+                echo "Cleaning dangling images..."
+                docker image prune -f
+                '''
+            }
+        }
+
+        stage ("Docker deploy") {
+
+            steps {
+                sh '''
+                set -e
+
+                cd ${BUILD_PATH}
+
+                echo "Running the new container"
+
+                Docker run -d -p "${HOST_PORT}:${CONTAINER_PORT}" --name ${CONTAINER_NAME} --restart unless-stopped "${IMAGE_NAME}/${IMAGE_TAG}"
+
+                '''
+            }
+
+        }
+
+        stage ("Cleaning Up") {
+            steps {
+                sh '''
+
+                echo "Cleaning up the old images"
+
+                docker image prune -f 
+
+                '''
+            }
+        }
+
+        post {
+            success {
+
+             echo 'DEV deployment completed successfully'
+
+            }
+            failure {
+             echo 'DEV deployment failed'
+
+            }
+
+                    always {
+
+            sh '''
+                echo "Docker container status:"
+                docker ps || true
+            '''
+        }
+        }
+
+    }
+}
