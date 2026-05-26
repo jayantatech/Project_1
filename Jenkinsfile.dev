@@ -4,9 +4,9 @@ pipeline{
     environment {
         OS_HOME="/home/ubuntu"
 
-        PROJECT="Project_1"
-        IMAGE_NAME="Project_1_dev"
-        CONTAINER_NAME="Project_1_dev"
+        PROJECT="project_1"
+        IMAGE_NAME="project_1_dev"
+        CONTAINER_NAME="project_1_dev"
         BRANCH="dev"
         IMAGE_TAG="${BRANCH}_${BUILD_NUMBER}"
 
