@@ -88,9 +88,15 @@ EOF
 
                 docker rm -f "${CONTAINER_NAME}" 2>/dev/null || true
 
-                 echo "Removing old image..."
+                echo "Removing old images except current build..."
 
-                docker rmi -f "${IMAGE_NAME}" 2>/dev/null || true
+                OLD_IMAGES=$(docker images "${IMAGE_NAME}" --format "{{.Repository}}:{{.Tag}}" | grep -v "${IMAGE_TAG}" || true)
+
+                if [ ! -z "$OLD_IMAGES" ]; then
+                    echo "$OLD_IMAGES" | xargs docker rmi -f
+                else
+                    echo "No old images found"
+                fi
 
                 echo "Building docker image..."
 
